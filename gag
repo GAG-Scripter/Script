@@ -1,0 +1,93 @@
+-- Create loading screen
+local player = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "LuluHubLoader"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Background
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+bg.Parent = gui
+
+-- Lulu Hub Title (Pink with orange outline)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0.15, 0)
+title.Position = UDim2.new(0, 0, 0.25, 0)
+title.BackgroundTransparency = 1
+title.Text = "Lulu Hub"
+title.TextColor3 = Color3.fromRGB(255, 105, 180) -- Pink
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.Parent = bg
+
+-- Add orange outline
+local titleOutline = Instance.new("UIStroke")
+titleOutline.Color = Color3.fromRGB(255, 165, 0) -- Orange outline
+titleOutline.Thickness = 2
+titleOutline.Parent = title
+
+-- [Keep all other UI elements (subtitle, counter, progress bar) as before...]
+
+-- Main loading function
+local function LoadScript()
+    local startTime = tick()
+    local loaded = false
+    local usedFallback = false
+    local success, err = pcall(function()
+        -- FIRST TRY: Load from GitHub
+        local gitSuccess, gitScript = pcall(function()
+            return loadstring(game:HttpGet(
+                "https://raw.githubusercontent.com/LuluHubScripts/GAG/main/GAG", 
+                true
+            ))()
+        end)
+        
+        if gitSuccess and type(gitScript) == "function" then
+            gitScript()
+            loaded = true
+        else
+            -- FALLBACK: Use Pastefy if GitHub fails
+            usedFallback = true
+            local pastefyScript = loadstring(game:HttpGet(
+                "https://pastefy.app/vwB91OLj/raw",
+                true
+            ))()
+            if type(pastefyScript) == "function" then
+                pastefyScript()
+                loaded = true
+            end
+        end
+    end)
+    
+    -- Animation loop (minimum 3 second display)
+    while tick() - startTime < 3 or not loaded do
+        local progress = math.min((tick() - startTime)/3, 1)
+        counter.Text = usedFallback and 
+                      "Fallback: "..math.floor(progress*100).."%" or
+                      math.floor(progress*100).."%"
+        barFill.Size = UDim2.new(progress, 0, 1, 0)
+        task.wait(0.03)
+    end
+    
+    -- Fade out
+    for i = 0, 1, 0.05 do
+        bg.BackgroundTransparency = i
+        title.TextTransparency = i
+        subtitle.TextTransparency = i
+        counter.TextTransparency = i
+        barBG.BackgroundTransparency = i
+        barFill.BackgroundTransparency = i
+        task.wait(0.03)
+    end
+    gui:Destroy()
+    
+    if not success then
+        warn("Load error:", err)
+    end
+end
+
+-- Start loading
+LoadScript()
