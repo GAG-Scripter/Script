@@ -29,7 +29,42 @@ titleOutline.Color = Color3.fromRGB(255, 165, 0) -- Orange outline
 titleOutline.Thickness = 2
 titleOutline.Parent = title
 
--- [Keep all other UI elements (subtitle, counter, progress bar) as before...]
+-- Subtitle (White)
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, 0, 0.1, 0)
+subtitle.Position = UDim2.new(0, 0, 0.38, 0)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Loading Screen"
+subtitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextScaled = true
+subtitle.Parent = bg
+
+-- Counter (Green)
+local counter = Instance.new("TextLabel")
+counter.Size = UDim2.new(1, 0, 0.1, 0)
+counter.Position = UDim2.new(0, 0, 0.5, 0)
+counter.BackgroundTransparency = 1
+counter.TextColor3 = Color3.fromRGB(0, 255, 0)
+counter.Font = Enum.Font.Code
+counter.TextScaled = true
+counter.Text = "0%"
+counter.Parent = bg
+
+-- Progress Bar BG
+local barBG = Instance.new("Frame")
+barBG.Size = UDim2.new(0.6, 0, 0.03, 0)
+barBG.Position = UDim2.new(0.2, 0, 0.6, 0)
+barBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+barBG.BorderSizePixel = 0
+barBG.Parent = bg
+
+-- Progress Bar Fill (Pink)
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+barFill.BorderSizePixel = 0
+barFill.Parent = barBG
 
 -- Main loading function
 local function LoadScript()
@@ -49,14 +84,15 @@ local function LoadScript()
             gitScript()
             loaded = true
         else
-            -- FALLBACK: Use Pastefy if GitHub fails
+            -- FALLBACK: Use Reverse Software loader if GitHub fails
             usedFallback = true
-            local pastefyScript = loadstring(game:HttpGet(
-                "https://pastefy.app/vwB91OLj/raw",
+            local ID = "e8952b8e-1999-477a-a48a-6a9a77ba4daf"
+            local reverseScript = loadstring(game:HttpGet(
+                "https://cdn.reverse.software/loader.luau",
                 true
             ))()
-            if type(pastefyScript) == "function" then
-                pastefyScript()
+            if type(reverseScript) == "function" then
+                reverseScript()
                 loaded = true
             end
         end
@@ -66,7 +102,7 @@ local function LoadScript()
     while tick() - startTime < 3 or not loaded do
         local progress = math.min((tick() - startTime)/3, 1)
         counter.Text = usedFallback and 
-                      "Fallback: "..math.floor(progress*100).."%" or
+                      "Reverse Loader: "..math.floor(progress*100).."%" or
                       math.floor(progress*100).."%"
         barFill.Size = UDim2.new(progress, 0, 1, 0)
         task.wait(0.03)
